@@ -1,8 +1,12 @@
 lib_managed/
 target/
+.idea/
+.idea_modules/
 .project
 .classpath
 .cache
 .ensime*
 *~
 TAGS
+.idea/codeStyleSettings.xml
+*.iml

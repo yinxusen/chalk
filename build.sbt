@@ -8,8 +8,6 @@ scalaVersion := "2.10.2"
 
 crossPaths := false
 
-retrieveManaged := true
-
 resolvers ++= Seq(
   "sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
   "sonatype releases" at "https://oss.sonatype.org/content/repositories/releases"
@@ -21,9 +19,11 @@ libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
   "com.novocode" % "junit-interface" % "0.8" % "test->default",
   "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
-  "org.scalanlp" % "breeze-core_2.10" % "0.4-SNAPSHOT",
-  "org.scalanlp" % "breeze-math_2.10" % "0.4-SNAPSHOT",
-  "org.scalanlp" % "nak" % "1.2.0-SNAPSHOT"
+  "org.scalanlp" % "breeze-core_2.10" % "0.4",
+  "org.scalanlp" % "breeze-math_2.10" % "0.4",
+  "org.scalanlp" % "nak" % "1.2.0-SNAPSHOT",
+  "commons-dbutils" % "commons-dbutils" % "1.5",
+  "mysql" % "mysql-connector-java" % "5.1.26"
 )
 
 publishTo <<= version { v: String =>
@@ -61,3 +61,4 @@ pomExtra := (
     </developer>
   </developers>
 )
+
