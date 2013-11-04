@@ -29,9 +29,11 @@ class REC(numTopics: Int, topicSmoothing: Double = 0.5, wordSmoothing: Double = 
 
   def iterations(data: IndexedSeq[SparseVector[Double]]): Iterator[Model] = {
     val numWords = data.head.size
+    val numDocs = data.size
     val termWeights = DenseMatrix.rand(numTopics, numWords) / numWords.toDouble
+    val topicMixes = new Array[DenseVector[Double]](numDocs)
 
-    Iterator.iterate(Model(termWeights, 0.0, numTopics, topicSmoothing, wordSmoothing)) { current =>
+    Iterator.iterate(Model(termWeights, topicMixes, 0.0, numTopics, topicSmoothing, wordSmoothing)) { current =>
       var ll = 0.0
       val counts = data.par.aggregate(null:DenseMatrix[Double])({ ( _counts, doc) =>
         val counts =  Option(_counts).getOrElse(DenseMatrix.zeros[Double](numTopics, numWords))
@@ -47,6 +49,10 @@ class REC(numTopics: Int, topicSmoothing: Double = 0.5, wordSmoothing: Double = 
         counts
       }, {_ += _})
 
+      val topics = data.map {
+        current.inference(_).topicLoadings
+      }.toArray
+
       // m step: Beta = exp(digamma(counts) - digamma(\sum(counts))
       counts += topicSmoothing
       val newCounts =  digamma(counts)
@@ -61,7 +67,7 @@ class REC(numTopics: Int, topicSmoothing: Double = 0.5, wordSmoothing: Double = 
       ll += lbeta(counts, Axis._1).sum
 
       exp.inPlace(newCounts)
-      current.copy(newCounts, ll)
+      current.copy(newCounts, topics, ll)
     }
 
   }.drop(1).take(numIterations)
@@ -69,7 +75,7 @@ class REC(numTopics: Int, topicSmoothing: Double = 0.5, wordSmoothing: Double = 
 
 object REC {
 
-  case class Model(termWeights: DenseMatrix[Double], likelihood: Double, numTopics: Int, topicSmoothing: Double, wordSmoothing: Double) {
+  case class Model(termWeights: DenseMatrix[Double], topicMixes: Array[DenseVector[Double]], likelihood: Double, numTopics: Int, topicSmoothing: Double, wordSmoothing: Double) {
     case class InferenceResult(topicLoadings: DenseVector[Double], wordLoadings: DenseMatrix[Double], ll: Double)
     def inference(doc: SparseVector[Double]) = {
       var converged = false
@@ -169,6 +175,10 @@ object REC {
     val rec = new REC(params.numTopics, params.topicSmoothing, params.wordSmoothing)
 
     val model = rec.iterations(trainingData).tee(m => println(m.likelihood)).last
+    for( (list, k) <- model.topicMixes zip keys) {
+      println("Doc %s:".format(k))
+      println(list)
+    }
     val topKLists = for(k <- 0 until numTopics) yield model.termWeights.t(::, k).argtopk(50).map(i => fmap.get(i) + " "+  model.termWeights(k, i))
     for( (list,k) <- topKLists.zipWithIndex) {
       println("Topic %d:".format(k))

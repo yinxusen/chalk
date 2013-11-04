@@ -8,6 +8,8 @@ scalaVersion := "2.10.2"
 
 crossPaths := false
 
+retrieveManaged := true
+
 resolvers ++= Seq(
   "sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
   "sonatype releases" at "https://oss.sonatype.org/content/repositories/releases"
