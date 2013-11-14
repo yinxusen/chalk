@@ -23,9 +23,10 @@ libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
   "org.scalanlp" % "breeze-core_2.10" % "0.4",
   "org.scalanlp" % "breeze-math_2.10" % "0.4",
-  "org.scalanlp" % "nak" % "1.2.0-SNAPSHOT",
+  "org.scalanlp" % "nak" % "1.2.0",
   "commons-dbutils" % "commons-dbutils" % "1.5",
-  "mysql" % "mysql-connector-java" % "5.1.26"
+  "mysql" % "mysql-connector-java" % "5.1.26",
+  "org.apache.lucene" % "lucene-analyzers-smartcn" % "4.5.1"
 )
 
 publishTo <<= version { v: String =>

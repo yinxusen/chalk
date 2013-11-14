@@ -5,7 +5,7 @@ import breeze.numerics._
 import breeze.config.CommandLineParser
 import breeze.util.Index
 import java.io.File
-import chalk.text.tokenize.JavaWordTokenizer
+import chalk.text.tokenize.smartcnTokenizer
 import chalk.text.transform.StopWordFilter
 import scala.io._
 import breeze.util.Implicits._
@@ -164,7 +164,8 @@ object REC {
       text <- values
     } yield {
       val builder = new VectorBuilder[Double](Int.MaxValue, text.length / 20)
-      for(tok <- JavaWordTokenizer(text) if tok(0).isLetter && removeStopWords(tok)) {
+      for(tok <- smartcnTokenizer(text) if tok(0).isLetter && removeStopWords(tok)) {
+        println(tok)
         builder.add(fmap.index(tok), 1.0)
       }
       builder
